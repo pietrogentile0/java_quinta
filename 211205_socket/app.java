@@ -24,14 +24,11 @@ public class app {
                 System.out.println(req);
             }
 
-            in.close();
-
             PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
             out.println("HTTP/1.1 200 OK");
-            out.println("Content-type: text/plain");
-            out.println("Content-length: 4\n\n");
-            out.println("Connection: close");
-            out.println("Ciao\n\n");
+            out.println("Content-Type: text/plain");
+            out.println("Content-Length: 4\n");
+            out.println("Ciao");
 
             out.close();
 
