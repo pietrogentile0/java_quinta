@@ -15,23 +15,25 @@ public class app {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             String req;
-            // while ((req = in.readLine()) != null) {
-            // System.out.println(req);
-            // }
-
-            for (int i = 0; i < 16; i++) {
-                req = in.readLine();
+            boolean isOneHead = false;
+            while(true){
+                req = in.readLine()
+                if(isOneHead && req.length() == 0){break;}
+                isOneHead = req.length() == 0 ?  true : false;
                 System.out.println(req);
             }
 
             PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
+            String res = "Ciao";
+
+            System.out.println("fine");
+
             out.println("HTTP/1.1 200 OK");
             out.println("Content-Type: text/plain");
-            out.println("Content-Length: 4\n");
+            out.println("Content-Length:"+res.length()+"\r\n");
             out.println("Ciao");
 
             out.close();
-
             socket.close();
             serverSocket.close();
         } catch (Exception e) {
