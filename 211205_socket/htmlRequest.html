@@ -1,0 +1,20 @@
+<html>
+
+<head>
+    <title>Prova socket</title>
+</head>
+
+<body>
+    <button id="button">Attiva socket</button>
+
+    <script>
+        document.querySelector("#button").addEventListener("click", async () => {
+            let response = await fetch("http://localho.st:3000", {
+                method: "POST",
+                body: "Richiesta http con body"
+            });
+        });
+    </script>
+</body>
+
+</html>
