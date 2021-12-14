@@ -14,15 +14,31 @@ public class app {
         try {
             // REQUEST parse
             ServerSocket serverSocket = new ServerSocket(3000);
-            while(true) {
+            while (true) {
                 Socket socket = serverSocket.accept(); // accept() returns a socket
-                System.out.println("nuova richiesta");
+                System.out.println("----nuova richiesta----");
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                parser(in);
+                Request req = parser(in);
+
+                System.out.println(req);
 
                 // RESPONSE
-                FileReader reader = new FileReader("htmlResponse.html");
+                PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+
+                FileReader reader;
+                switch (req.uri) {
+                    case "/contact-us": {
+                        reader = new FileReader(".\\responses\\contact-us.html");
+                        break;
+                    }
+
+                    default: {
+                        reader = new FileReader(".\\responses\\home.html");
+                        break;
+                    }
+                }
+
                 BufferedReader br = new BufferedReader(reader);
                 String fromFile, res = "";
 
@@ -31,8 +47,6 @@ public class app {
                 }
                 br.close();
 
-                PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
-
                 out.println("HTTP/1.1 200 OK");
                 out.println("Content-Type: text/html");
                 out.println("Content-Length:" + res.length() + "\n");
@@ -40,24 +54,27 @@ public class app {
                 out.flush();
                 out.close();
             }
+            // socket.close();
+            // serverSocket.close();
         } catch (Exception e) {
             System.out.println(e);
         }
     }
 
-    public static void parser(BufferedReader in) throws IOException {
+    public static Request parser(BufferedReader in) throws IOException {
         String[] firstLineParts = in.readLine().split(" ");
         String method = firstLineParts[0];
         String uri = firstLineParts[1];
-        
+
         HashMap<String, String[]> headers = headerParser(in);
 
-        String body = null;
         if (headers.containsKey("Content-Length")) {
-            System.out.print("\n");
+            String body = null;
             body = bodyParser(in, Integer.parseInt(headers.get("Content-Length")[0]));
-            System.out.print(body);
+            return new Request(method, uri, headers, body); // with body
         }
+
+        return new Request(method, uri, headers); // without body
     }
 
     public static HashMap<String, String[]> headerParser(BufferedReader in) throws IOException {
