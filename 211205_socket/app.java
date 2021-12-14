@@ -14,38 +14,42 @@ public class app {
         try {
             // REQUEST parse
             ServerSocket serverSocket = new ServerSocket(3000);
-            Socket socket = serverSocket.accept(); // accept() returns a socket
+            while(true) {
+                Socket socket = serverSocket.accept(); // accept() returns a socket
+                System.out.println("nuova richiesta");
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            parser(in);
+                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                parser(in);
 
-            // RESPONSE
-            FileReader reader = new FileReader("htmlResponse.html");
-            BufferedReader br = new BufferedReader(reader);
-            String fromFile, res = "";
+                // RESPONSE
+                FileReader reader = new FileReader("htmlResponse.html");
+                BufferedReader br = new BufferedReader(reader);
+                String fromFile, res = "";
 
-            while ((fromFile = br.readLine()) != null) {
-                res = res + fromFile + "\n";
+                while ((fromFile = br.readLine()) != null) {
+                    res = res + fromFile + "\n";
+                }
+                br.close();
+
+                PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+
+                out.println("HTTP/1.1 200 OK");
+                out.println("Content-Type: text/html");
+                out.println("Content-Length:" + res.length() + "\n");
+                out.print(res);
+                out.flush();
+                out.close();
             }
-            br.close();
-
-            PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
-
-            out.println("HTTP/1.1 200 OK");
-            out.println("Content-Type: text/html");
-            out.println("Content-Length:" + res.length() + "\n");
-            out.print(res);
-
-            serverSocket.close();
-            socket.close(); // chiude tutto
         } catch (Exception e) {
             System.out.println(e);
         }
     }
 
     public static void parser(BufferedReader in) throws IOException {
-        String method = in.readLine().split(" ")[0];
-
+        String[] firstLineParts = in.readLine().split(" ");
+        String method = firstLineParts[0];
+        String uri = firstLineParts[1];
+        
         HashMap<String, String[]> headers = headerParser(in);
 
         String body = null;
@@ -64,7 +68,6 @@ public class app {
         HashMap<String, String[]> headers = new HashMap<String, String[]>();
         // per ovviare al problema del != null
         while ((line = in.readLine()).length() != 0) {
-            System.out.println(line);
             String[] parts = line.split(": ");
             headers.put(parts[0], parts[1].split(","));
         }
