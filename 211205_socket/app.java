@@ -74,7 +74,7 @@ public class app {
 
     public static String bodyParser(BufferedReader in, int bodyLength) throws IOException {
         String body = "";
-        for (int i = 0; i <= bodyLength; i++) {
+        for (int i = 0; i < bodyLength; i++) {
             body = body + (char) in.read();
         }
         return body;
