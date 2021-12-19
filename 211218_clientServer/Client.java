@@ -1,36 +1,50 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-public class Client{
+public class Client {
     public static void main(String[] args) {
         final int port = 3000;
 
-        try{
-            while(true){
-                Socket serverOut = new Socket("localhost", port);
-                PrintWriter writer = new PrintWriter(serverOut.getOutputStream(), true);
-                Scanner clientMessage = new Scanner(System.in);
-                writer.println(clientMessage.nextLine());
-                writer.flush();
-                writer.close();
-                serverOut.close();
-                
-                ServerSocket socket = new ServerSocket(port);
-                Socket serverIn = socket.accept();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(serverIn.getInputStream()));
-                String responseFromServer;
-                while((responseFromServer = reader.readLine()).length() > 0){
-                    System.out.println(responseFromServer);
+        try {
+            Socket socket = new Socket("localhost", port);
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            Scanner clientMessageReader = new Scanner(System.in);
+            String clientMessage;
+            String serverMessage;
+
+            while (true) {
+                // manda la risposta in ogni caso. poi il server agirà in base al messaggio
+                clientMessage = clientMessageReader.nextLine();
+                out.println(clientMessage);
+                out.flush();
+                if (clientMessage.equals("quit")) {
+                    System.out.println("\n----- Hai interrotto la connessione -----");
+                    socket.close();
+                    break;
+                } else {
+                    if ((serverMessage = in.readLine()).equals("quit")) {
+                        System.out.println("\n----- Connessione interrotta dal server -----");
+                        break;
+                    } else {
+                        System.out.println("\t\t\t\t" + serverMessage);
+                    }
                 }
-                socket.close();
             }
-        }catch(Exception e){
+            in.close();
+            out.close();
+            clientMessageReader.close();
+        } catch (NoSuchElementException e) {
+            System.out.println("\n----- Hai interrotto forzatamente la connessione -----");
+        } catch (SocketException e) {
+            System.out.println("\n----- Connessione interrotta forzatamente dal server -----");
+        } catch (Exception e) {
             System.out.println(e);
         }
-            
     }
 }
