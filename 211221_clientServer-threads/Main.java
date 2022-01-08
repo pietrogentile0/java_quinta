@@ -23,6 +23,12 @@ public class Chat {
                 Socket endpoint = server.accept();
 
                 server.close(); // non accetta più altre richieste
+                if ((serverMessage = in.readLine()).equals("quit")) {
+                    System.out.println("\n----- Connessione interrotta dal server -----");
+                    break;
+                } else {
+                    System.out.println("\t\t\t\t" + serverMessage);
+                }
             } else {
                 socket = new Socket("localhost", port);
             }
@@ -55,5 +61,9 @@ public class Chat {
         } catch (Exception e) {
             System.out.println(e);
         }
+
+        // public static String readSocket(BufferedReader in){
+        //     return 
+        // }
     }
 }
