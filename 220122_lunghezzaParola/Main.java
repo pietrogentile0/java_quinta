@@ -1,31 +1,34 @@
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.InputStreamReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        File file;
         if (args.length > 0) {
-            file = new File(args[0]);
-        }
-        System.out.println("Inserire N: ");
-        Scanner keyboard = new Scanner(System.in);
-        try {
-            FileReader fileScanner = new FileReader(file);
+            System.out.print("Inserire N: ");
+            Scanner keyboard = new Scanner(System.in);
             final int N = keyboard.nextInt();
-            String word;
-            while ((word = ) != null) {
-                if (word.length() >= N) {
-                    System.out.println(word);
-
+            try {
+                FileWriter fileWriter = new FileWriter("minori.txt");
+                // fileReader = new BufferedReader(new InputStreamReader(new
+                // FileInputStream(args[0])));
+                Scanner fileReader = new Scanner(new File(args[0]));
+                String word;
+                while (fileReader.hasNext()) {
+                    if ((word = fileReader.next()).length() >= N) {
+                        System.out.println(word);
+                    } else {
+                        fileWriter.append(word + "\n");
+                    }
                 }
-
+                fileWriter.close();
+            } catch (Exception e) {
+                System.out.println(e);
             }
-        } catch (Exception e) {
-            System.out.println(e);
+            keyboard.close();
+        } else {
+            System.out.println("Inserire argomento contenente nome file");
         }
-
     }
 }
